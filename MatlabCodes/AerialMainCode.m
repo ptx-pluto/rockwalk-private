@@ -94,99 +94,33 @@ sim_num=2;
     
     %----------------------------------------------------------
     %kinematic non-fixe apex point
-if sim_num==2
     % in this part it is assumed that the apex point is not fixed anymore
     % each of the euler angles are supposed to follow a priodic
     % trjectory
     period_psi=2.3;
     period_theta=2.3;
-    period_phi=2.3;
-    omega_psi=2*pi/period_psi;
-    omega_theta=2*pi/period_theta;
-    omega_phi=2*pi/period_phi;
+    period_phi=2.3;    
     max_amplitude_phi=60*pi/180;
-    coeff_t_phi=max_amplitude_phi/(5*period_phi);
     amplitut_psi=30*pi/180;
     amplitut_theta=0*pi/180;
     diff_phase_psi=pi/2;
     diff_phase_theta=0;
     diff_phase_phi=0;
     save('sim_par','sim_num','period_psi','period_theta','period_phi','amplitut_psi','amplitut_theta','max_amplitude_phi','diff_phase_psi','diff_phase_theta','diff_phase_phi');
-    
-    
-    % setting the initial conditions
-    Init_psi=amplitut_psi;
-    Init_theta=45*pi/180;
-    Init_phi=0*pi/180;
-    
-    MatR1z=[cos(Init_psi) -sin(Init_psi) 0; sin(Init_psi) cos(Init_psi) 0; 0 0 1;];
-    MatR2y = [cos(Init_theta) 0 sin(Init_theta); 0 1 0; -sin(Init_theta) 0 cos(Init_theta);];
-    Init_r_O=[0;0;0]+MatR1z*MatR2y*[-r;0;0];
-    
-    Init_x_O=Init_r_O(1,1);
-    Init_y_O=Init_r_O(2,1);
-    Init_z_O=Init_r_O(3,1);
-    
-    
-    
-    % Setting the initial velocity of the euler angles
-    Init_d_psi=amplitut_psi*omega_psi*cos(omega_psi*0+diff_phase_psi);
-    Init_d_theta=amplitut_theta*omega_theta*cos(omega_theta*0+diff_phase_theta);
-    Init_d_phi=(coeff_t_phi*0)*omega_phi*cos(omega_phi*0+diff_phase_phi);
-    
-    %The initial velocity shoud satisfy the constraint equations
-    %here the euler angles are free variables and the other variables are
-    %computed with respect to the constraints of rolling without slippage
-    [Mat_a_const,Mat_d_a_const]=fun_Mat_a_const([Init_x_O,Init_y_O,Init_z_O,Init_psi,Init_theta,Init_phi],zeros(6,1));
-    depend_vel_var=-inv(Mat_a_const(1:3,1:3))*Mat_a_const(1:3,4:6)*[Init_d_psi;Init_d_theta;Init_d_phi];
-    Init_d_x_O=depend_vel_var(1,1);Init_d_y_O=depend_vel_var(2,1);Init_d_z_O=depend_vel_var(3,1);
-    
+       
     % setting the time span and calling the ode45
     t_end=12;
     t_span=0:t_end/500:t_end;
-    initial_cond=[Init_x_O;Init_y_O;Init_z_O;Init_psi;Init_theta;Init_phi;Init_d_x_O;Init_d_y_O;Init_d_z_O;Init_d_psi;Init_d_theta;Init_d_phi]; %
+    initial_cond= calc_init_state();
     
     isterminal = 0;  % Halt integration
     direction = 0;   % The zero can be approached from either direction
     save('eventopt','isterminal','direction');
-    %opts = odeset('Events',@EventsFcn);
-    [vect_t,Var,~]=ode45(@SteadyStateFunction,t_span,initial_cond);
+    opts = odeset('Events',@EventsFcn);
+    [vect_t,Var,~]=ode45(@coneEOM,t_span,initial_cond,opts);
 
-
-
-
-end
 
 [glob_coor_xyz,glob_coor_A]=fun_coorG(Var);
-
-
-% % This part is to plot A_theta*sin(omega_theta*t)
-% figure
-% plot(vect_t,Var(:,6),'-b')
-% freq(1)=vect_te(length(vect_te))-vect_te(length(vect_te)-2);
-% freq(2)=vect_te(length(vect_te)-2)-vect_te(length(vect_te)-4);
-% freq(3)=vect_te(length(vect_te)-4)-vect_te(length(vect_te)-6);
-% vect_freq=2*pi/mean(freq);
-% vect_max_phi=max(Var(:,6));
-% hold on
-% plot(vect_t,vect_max_phi*sin(vect_freq*vect_t),'r')
-
-
-
-% %%This part is to plot the trajectory and the points with phi=0
-% figure
-% plot(glob_coor_xyz(:,1),glob_coor_xyz(:,2),'k');
-% xlabel('x(m)')
-% ylabel('y(m)')
-% axis([4 6 -1 1])
-% hold on
-% [glob_coor_xyz_e,glob_coor_A_e]=fun_coorG(Vare);
-% for itie=1:length(ie)
-%     plot(glob_coor_xyz_e(itie,1),glob_coor_xyz_e(itie,2),'bo');
-% end
-% plot(glob_coor_xyz_e(:,1),glob_coor_xyz_e(:,2),'b-.')
-%
-
 
 figure(1)
 h1 = subplot(2,2,1);
@@ -214,6 +148,97 @@ plot(glob_coor_A(:,1),glob_coor_A(:,2));
 subplot(h4);
 draw_cone(Var,glob_coor_xyz);
 
+
+function x0 = calc_init_state()
+
+    load('sim_par');
+    load('robot');
+    
+    omega_psi=2*pi/period_psi;
+    omega_theta=2*pi/period_theta;
+    omega_phi=2*pi/period_phi;
+    
+    coeff_t_phi=max_amplitude_phi/(5*period_phi);
+    
+    % setting the initial conditions
+    Init_psi=amplitut_psi;
+    Init_theta=45*pi/180;
+    Init_phi=0*pi/180;
+    
+    MatR1z=[cos(Init_psi) -sin(Init_psi) 0; sin(Init_psi) cos(Init_psi) 0; 0 0 1;];
+    MatR2y = [cos(Init_theta) 0 sin(Init_theta); 0 1 0; -sin(Init_theta) 0 cos(Init_theta);];
+    Init_r_O=[0;0;0]+MatR1z*MatR2y*[-r;0;0];
+    
+    Init_x_O=Init_r_O(1,1);
+    Init_y_O=Init_r_O(2,1);
+    Init_z_O=Init_r_O(3,1);
+    
+    % Setting the initial velocity of the euler angles
+    Init_d_psi=amplitut_psi*omega_psi*cos(omega_psi*0+diff_phase_psi);
+    Init_d_theta=amplitut_theta*omega_theta*cos(omega_theta*0+diff_phase_theta);
+    Init_d_phi=(coeff_t_phi*0)*omega_phi*cos(omega_phi*0+diff_phase_phi);
+    
+    %The initial velocity shoud satisfy the constraint equations
+    %here the euler angles are free variables and the other variables are
+    %computed with respect to the constraints of rolling without slippage
+    [Mat_a_const,Mat_d_a_const]=fun_Mat_a_const([Init_x_O,Init_y_O,Init_z_O,Init_psi,Init_theta,Init_phi],zeros(6,1));
+    depend_vel_var=-inv(Mat_a_const(1:3,1:3))*Mat_a_const(1:3,4:6)*[Init_d_psi;Init_d_theta;Init_d_phi];
+    Init_d_x_O=depend_vel_var(1,1);Init_d_y_O=depend_vel_var(2,1);Init_d_z_O=depend_vel_var(3,1);  
+
+    x0 = [Init_x_O;Init_y_O;Init_z_O;Init_psi;Init_theta;Init_phi;Init_d_x_O;Init_d_y_O;Init_d_z_O;Init_d_psi;Init_d_theta;Init_d_phi];
+
+end
+
+
+function vect_d_q=coneEOM(vect_t,initial_cond)
+
+% We have two sets of differential equaiotns.
+
+% the first set is the differential equations relating to the system
+% dynamic as: [M]*dd_q=[CG];
+%[M] is the matrix of inertia
+%[CG] is the vector of sum of the coriolis and gravity vector
+
+% the second set is related to the velocity constriants as:
+%[a]*d_q=-[b]
+%[a] is the coefficient of the first order derivative of the generelized
+%coordinat
+
+    load('robot');
+    load('sim_par')
+
+    %-----------------------------------------------------------------
+    %kinematic with non-fixed apex point
+    
+    %defining the trajectories of the euler angles depnting to time
+    omega_psi=2*pi/period_psi;
+    omega_theta=2*pi/period_theta;
+    omega_phi=2*pi/period_phi;
+    coeff_t_phi=max_amplitude_phi/(5*period_phi);
+    
+
+    if vect_t<0*period_phi
+        Dphi=(coeff_t_phi*vect_t)*omega_phi*cos(omega_phi*vect_t+diff_phase_phi);
+    else
+        Dphi=max_amplitude_phi*omega_phi*cos(omega_phi*vect_t+diff_phase_phi);
+    end
+    
+    Dpsi=amplitut_psi*omega_psi*cos(omega_psi*vect_t+diff_phase_psi);
+    Dtheta= amplitut_theta*omega_theta*cos(omega_theta*vect_t+diff_phase_theta);
+    
+    vect_q=initial_cond;
+    vect_d_q=zeros(length(initial_cond),1);
+    
+    % for the current general coordinates the [a] and its time derivative
+    % are obtained by callig the Matlab function fun_Mat_a_const 
+    % here we only consider the first three constraints and those relating
+    % to the fixed apex point is not considered here.
+    [Mat_a_const,Mat_d_a_const]=fun_Mat_a_const(vect_q(1:6,1),vect_q(7:12,1));
+    depend_vel_var=-inv(Mat_a_const(1:3,1:3))*Mat_a_const(1:3,4:6)*[Dpsi;Dtheta;Dphi];
+    vect_d_q(1:3)=depend_vel_var(1:3);
+    vect_d_q(4:6)=[Dpsi;Dtheta;Dphi];
+
+end
 
 function draw_cone(Var,glob_coor_xyz)
 load('robot');
