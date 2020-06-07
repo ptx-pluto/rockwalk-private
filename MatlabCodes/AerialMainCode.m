@@ -203,11 +203,9 @@ hold on
 plot(vect_t(:,1),Var(:,5),'r')
 plot(vect_t(:,1),Var(:,6),'g')
 axis([0 20 -1.5 3])
-% xlabel('t')
-% ylabel('rad')
-% legend('\psi','\theta','\phi')
-
-
+xlabel('t')
+ylabel('rad')
+legend('\psi','\theta','\phi')
 
 
 subplot(h3);
@@ -215,14 +213,6 @@ plot(glob_coor_A(:,1),glob_coor_A(:,2));
 
 subplot(h4);
 draw_cone(Var,glob_coor_xyz);
-
-
-%v_cone = VideoWriter('TrajZigzagCone.avi');
-%v_cone.FrameRate=round(length(vect_t)/vect_t(end,1));
-%open(v_cone);
-%writeVideo(v_cone,mat_frame);
-%close(v_cone);
-% movie(mat_frame,1,round(length(vect_t)/vect_t(end,1)))
 
 
 function draw_cone(Var,glob_coor_xyz)
