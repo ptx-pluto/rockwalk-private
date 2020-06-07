@@ -149,8 +149,8 @@ if sim_num==2
     isterminal = 0;  % Halt integration
     direction = 0;   % The zero can be approached from either direction
     save('eventopt','isterminal','direction');
-    opts = odeset('Events',@EventsFcn);
-    [vect_t,Var,vect_te,Vare,ie]=ode45(@SteadyStateFunction,t_span,initial_cond,opts);
+    %opts = odeset('Events',@EventsFcn);
+    [vect_t,Var,~]=ode45(@SteadyStateFunction,t_span,initial_cond);
 
 
 
