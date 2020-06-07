@@ -188,11 +188,16 @@ end
 %
 
 
-figure
+figure(1)
+h1 = subplot(2,2,1);
+h2 = subplot(2,2,2);
+h3 = subplot(2,2,3);
+h4 = subplot(2,2,4);
 
-plot(vect_t(:,1),Var(:,6),'b')
+subplot(h1);
+plot(vect_t(:,1),Var(:,6),'b');
 
-figure
+subplot(h2)
 plot(vect_t(:,1),Var(:,4),'b')
 hold on
 plot(vect_t(:,1),Var(:,5),'r')
@@ -205,9 +210,10 @@ axis([0 20 -1.5 3])
 
 
 
-figure
-plot(glob_coor_A(:,1),glob_coor_A(:,2))
-figure
+subplot(h3);
+plot(glob_coor_A(:,1),glob_coor_A(:,2));
+
+subplot(h4);
 draw_cone(Var,glob_coor_xyz);
 
 
