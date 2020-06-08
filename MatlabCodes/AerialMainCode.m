@@ -97,30 +97,77 @@ sim_num=2;
     % in this part it is assumed that the apex point is not fixed anymore
     % each of the euler angles are supposed to follow a priodic
     % trjectory
-    period_psi=2.3;
-    period_theta=2.3;
-    period_phi=2.3;    
-    max_amplitude_phi=60*pi/180;
-    amplitut_psi=30*pi/180;
-    amplitut_theta=0*pi/180;
-    diff_phase_psi=pi/2;
-    diff_phase_theta=0;
-    diff_phase_phi=0;
-    save('sim_par','sim_num','period_psi','period_theta','period_phi','amplitut_psi','amplitut_theta','max_amplitude_phi','diff_phase_psi','diff_phase_theta','diff_phase_phi');
-       
+%     period_psi=2.3;
+%     period_theta=2.3;
+%     period_phi=2.3;    
+%     max_amplitude_phi=60*pi/180;
+%     amplitut_psi=30*pi/180;
+%     amplitut_theta=0*pi/180;
+%     diff_phase_psi=pi/2;
+%     diff_phase_theta=0;
+%     diff_phase_phi=0;
+%     save('sim_par','sim_num','period_psi','period_theta','period_phi','amplitut_psi','amplitut_theta','max_amplitude_phi','diff_phase_psi','diff_phase_theta','diff_phase_phi');
+%        
     % setting the time span and calling the ode45
-    t_end=12;
-    t_span=0:t_end/500:t_end;
-    initial_cond= calc_init_state();
-    
-    isterminal = 0;  % Halt integration
-    direction = 0;   % The zero can be approached from either direction
-    save('eventopt','isterminal','direction');
-    opts = odeset('Events',@EventsFcn);
-    [vect_t,Var,~]=ode45(@coneEOM,t_span,initial_cond,opts);
+%     t_end=12;
+%     t_span=0:t_end/500:t_end;
+%     initial_cond= calc_init_state();
+%     
+%     isterminal = 0;  % Halt integration
+%     direction = 0;   % The zero can be approached from either direction
+%     save('eventopt','isterminal','direction');
+%     opts = odeset('Events',@EventsFcn);
+%     [vect_t,Var,~]=ode45(@coneEOM,t_span,initial_cond,opts);
+% 
+% 
+% [glob_coor_xyz,glob_coor_A]=fun_coorG(Var);
+% 
+% figure(1)
+% h1 = subplot(2,2,1);
+% h2 = subplot(2,2,2);
+% h3 = subplot(2,2,3);
+% h4 = subplot(2,2,4);
+% 
+% subplot(h1);
+% plot(vect_t(:,1),Var(:,6),'b');
+% 
+% subplot(h2)
+% plot(vect_t(:,1),Var(:,4),'b')
+% hold on
+% plot(vect_t(:,1),Var(:,5),'r')
+% plot(vect_t(:,1),Var(:,6),'g')
+% axis([0 20 -1.5 3])
+% xlabel('t')
+% ylabel('rad')
+% legend('\psi','\theta','\phi')
+% 
+% 
+% subplot(h3);
+% plot(glob_coor_A(:,1),glob_coor_A(:,2));
+% 
+% subplot(h4);
+% draw_cone(Var,glob_coor_xyz);
 
+simulate_aerial_rnw();
 
-[glob_coor_xyz,glob_coor_A]=fun_coorG(Var);
+function simulate_aerial_rnw()
+
+tstep = 0.002;
+vstep = 0.05;
+
+period_psi=2.3;
+period_theta=2.3;
+period_phi=2.3;    
+max_amplitude_phi=60*pi/180;
+amplitut_psi=30*pi/180;
+amplitut_theta=0*pi/180;
+diff_phase_psi=pi/2;
+diff_phase_theta=0;
+diff_phase_phi=0;
+save('sim_par','period_psi','period_theta','period_phi','amplitut_psi','amplitut_theta','max_amplitude_phi','diff_phase_psi','diff_phase_theta','diff_phase_phi');
+
+x = calc_init_state();
+t = 0;
 
 figure(1)
 h1 = subplot(2,2,1);
@@ -129,25 +176,54 @@ h3 = subplot(2,2,3);
 h4 = subplot(2,2,4);
 
 subplot(h1);
-plot(vect_t(:,1),Var(:,6),'b');
+l1 = plot(t,x(6),'b');
 
 subplot(h2)
-plot(vect_t(:,1),Var(:,4),'b')
+l2 = plot(t,x(4),'b')
 hold on
-plot(vect_t(:,1),Var(:,5),'r')
-plot(vect_t(:,1),Var(:,6),'g')
+l3 = plot(t,x(5),'r')
+l4 = plot(t,x(6),'g')
 axis([0 20 -1.5 3])
 xlabel('t')
 ylabel('rad')
 legend('\psi','\theta','\phi')
 
-
 subplot(h3);
-plot(glob_coor_A(:,1),glob_coor_A(:,2));
+[~,glob_coor_A]=coorG(x);
+l5 = plot(glob_coor_A(1),glob_coor_A(2));
 
 subplot(h4);
-draw_cone(Var,glob_coor_xyz);
+%draw_cone(Var,glob_coor_xyz);
 
+while (1)
+
+    vt = t:tstep:t+vstep;
+    [~,xsave] = ode45(@coneEOM,vt,x);
+    x = xsave(end,:);
+    t = t+vstep;
+
+    set(l1, 'XData', [get(l1, 'XData') t]);
+    set(l1, 'YData', [get(l1, 'YData') x(6)]);
+    
+    set(l2, 'XData', [get(l2, 'XData') t]);
+    set(l2, 'YData', [get(l2, 'YData') x(4)]);
+
+    set(l3, 'XData', [get(l3, 'XData') t]);
+    set(l3, 'YData', [get(l3, 'YData') x(5)]);
+
+    set(l4, 'XData', [get(l4, 'XData') t]);
+    set(l4, 'YData', [get(l4, 'YData') x(6)]);
+   
+    [~,glob_coor_A]=coorG(x);
+    
+    set(l5, 'XData', [get(l5, 'XData') glob_coor_A(1)]);
+    set(l5, 'YData', [get(l5, 'YData') glob_coor_A(2)]);    
+
+    pause(vstep);
+    
+end
+
+end
 
 function x0 = calc_init_state()
 
@@ -188,7 +264,6 @@ function x0 = calc_init_state()
     x0 = [Init_x_O;Init_y_O;Init_z_O;Init_psi;Init_theta;Init_phi;Init_d_x_O;Init_d_y_O;Init_d_z_O;Init_d_psi;Init_d_theta;Init_d_phi];
 
 end
-
 
 function vect_d_q=coneEOM(vect_t,initial_cond)
 
@@ -286,5 +361,69 @@ for it_sim=1:size(Var,1)
     hold off 
     pause(1/30);
 end
+
+end
+
+function draw_cone_once(Var,glob_coor_xyz)
+load('robot');
+
+for it_sim=1:size(Var,1)
+    
+
+    plot3(glob_coor_xyz(:,1),glob_coor_xyz(:,2),glob_coor_xyz(:,3),'k');
+    axis(2*[-AH 1*AH -1*AH 1*AH -0.1 1*AH]);
+    xlabel('x(m)')
+    ylabel('y(m)')
+    zlabel('z(m)')
+    hold on
+    box on
+    
+    coor_O=[Var(it_sim,1);Var(it_sim,2);Var(it_sim,3)];
+    MatR1z=[-sin(Var(it_sim,4)) -cos(Var(it_sim,4)) 0; cos(Var(it_sim,4)) -sin(Var(it_sim,4)) 0; 0 0 1;];
+    MatR2y=[cos(Var(it_sim,5)) 0 sin(Var(it_sim,5)); 0 1 0; -sin(Var(it_sim,5)) 0 cos(Var(it_sim,5));];
+    MatR3z=[cos(Var(it_sim,6)),-sin(Var(it_sim,6)),0;sin(Var(it_sim,6)),cos(Var(it_sim,6)),0;0,0,1];
+    MatRp=MatR1z*MatR2y;
+    MatR=MatRp*MatR3z;
+    coor_A=coor_O+MatR*[OH;0;AH];
+    plotcircle3d(r,coor_O,MatR(:,3));
+    
+    Coor_B=coor_O+MatR*[-r;0;0];
+    Coor_C=coor_O+MatR*[r;0;0];
+    Coor_D=coor_O+MatR*[0;-r;0];
+    Coor_E=coor_O+MatR*[0;r;0];
+    Coor_F=coor_O+MatR*r*[cos(pi/3);sin(pi/3);0];
+    Coor_G=coor_O+MatR*r*[cos(pi+pi/3);sin(pi+pi/3);0];
+    Coor_H=coor_O+MatR*r*[cos(pi/6);sin(pi/6);0];
+    Coor_I=coor_O+MatR*r*[cos(pi+pi/6);sin(pi+pi/6);0];
+    MatB=coor_O*ones(1,4)+MatR*MatB_local;
+    
+    plot3([coor_A(1),Coor_B(1)],[coor_A(2),Coor_B(2)],[coor_A(3),Coor_B(3)],'g','LineWidth',2);
+    plot3([coor_A(1),Coor_C(1)],[coor_A(2),Coor_C(2)],[coor_A(3),Coor_C(3)],'g','LineWidth',2);
+    plot3([coor_A(1),Coor_D(1)],[coor_A(2),Coor_D(2)],[coor_A(3),Coor_D(3)],'g','LineWidth',2);
+    plot3([coor_A(1),Coor_E(1)],[coor_A(2),Coor_E(2)],[coor_A(3),Coor_E(3)],'g','LineWidth',2);
+    plot3([coor_A(1),Coor_F(1)],[coor_A(2),Coor_F(2)],[coor_A(3),Coor_F(3)],'g','LineWidth',2);
+    plot3([coor_A(1),Coor_G(1)],[coor_A(2),Coor_G(2)],[coor_A(3),Coor_G(3)],'g','LineWidth',2);
+    plot3([coor_A(1),Coor_H(1)],[coor_A(2),Coor_H(2)],[coor_A(3),Coor_H(3)],'g','LineWidth',2);
+    plot3([coor_A(1),Coor_I(1)],[coor_A(2),Coor_I(2)],[coor_A(3),Coor_I(3)],'g','LineWidth',2);
+
+
+    hold off 
+    pause(1/30);
+end
+
+end
+
+function [coor_G,coor_A]=coorG(Var)
+
+load('robot');
+
+MatR1z=[-sin(Var(4)) -cos(Var(4)) 0; cos(Var(4)) -sin(Var(4)) 0; 0 0 1;];
+MatR2y = [cos(Var(5)) 0 sin(Var(5)); 0 1 0; -sin(Var(5)) 0 cos(Var(5));];
+MatR3z=[cos(Var(6)) -sin(Var(6)) 0; sin(Var(6)) cos(Var(6)) 0; 0 0 1;];
+coor_G=[Var(1);Var(2);Var(3)]+MatR1z*MatR2y*[r;0;0];
+coor_A=[Var(1);Var(2);Var(3)]+MatR1z*MatR2y*MatR3z*[OH;0;AH];
+
+coor_G=coor_G';
+coor_A=coor_A';
 
 end
