@@ -175,18 +175,15 @@ h2 = subplot(2,2,2);
 h3 = subplot(2,2,3);
 h4 = subplot(2,2,4);
 
-subplot(h1);
-l1 = plot(t,x(6),'b');
-
-subplot(h2)
-l2 = plot(t,x(4),'b')
-hold on
-l3 = plot(t,x(5),'r')
-l4 = plot(t,x(6),'g')
+subplot(h2);
+l2 = plot(t,x(4),'b');
+hold on;
+l3 = plot(t,x(5),'r');
+l4 = plot(t,x(6),'g');
 axis([0 20 -1.5 3])
-xlabel('t')
-ylabel('rad')
-legend('\psi','\theta','\phi')
+xlabel('t');
+ylabel('rad');
+legend('\psi','\theta','\phi');
 
 subplot(h3);
 [~,glob_coor_A]=coorG(x);
@@ -202,9 +199,6 @@ while (1)
     x = xsave(end,:);
     t = t+vstep;
 
-    set(l1, 'XData', [get(l1, 'XData') t]);
-    set(l1, 'YData', [get(l1, 'YData') x(6)]);
-    
     set(l2, 'XData', [get(l2, 'XData') t]);
     set(l2, 'YData', [get(l2, 'YData') x(4)]);
 
