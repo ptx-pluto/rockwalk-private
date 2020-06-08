@@ -152,6 +152,8 @@ simulate_aerial_rnw();
 
 function simulate_aerial_rnw()
 
+load('robot')
+
 tstep = 0.002;
 vstep = 0.05;
 
@@ -186,11 +188,18 @@ ylabel('rad');
 legend('\psi','\theta','\phi');
 
 subplot(h3);
-[~,glob_coor_A]=coorG(x);
+[glob_coor_xyz,glob_coor_A]=coorG(x);
 l5 = plot(glob_coor_A(1),glob_coor_A(2));
 
 subplot(h4);
-%draw_cone(Var,glob_coor_xyz);
+axis(2*[-AH 1*AH -1*AH 1*AH -0.1 1*AH]);
+xlabel('x(m)');
+ylabel('y(m)');
+zlabel('z(m)');
+
+traj_g = [glob_coor_xyz,];
+traj_a = [calc_apex(x),];
+draw_cone_once(h4,x);
 
 while (1)
 
@@ -208,11 +217,19 @@ while (1)
     set(l4, 'XData', [get(l4, 'XData') t]);
     set(l4, 'YData', [get(l4, 'YData') x(6)]);
    
-    [~,glob_coor_A]=coorG(x);
+    [glob_coor_xyz,glob_coor_A]=coorG(x);
     
     set(l5, 'XData', [get(l5, 'XData') glob_coor_A(1)]);
     set(l5, 'YData', [get(l5, 'YData') glob_coor_A(2)]);    
 
+    subplot(h4);
+    traj_g = [traj_g;glob_coor_xyz];
+    traj_a = [traj_a;calc_apex(x)];
+    plot3(traj_g(:,1),traj_g(:,2),traj_g(:,3),'k');
+    hold on;
+    plot3(traj_a(:,1),traj_a(:,2),traj_a(:,3),'k');
+    draw_cone_once(h4,x);
+    
     pause(vstep);
     
 end
@@ -358,24 +375,30 @@ end
 
 end
 
-function draw_cone_once(Var,glob_coor_xyz)
-load('robot');
+function coor_A = calc_apex(Var)
+    load('robot');
+    coor_O=[Var(1);Var(2);Var(3)];
+    MatR1z=[-sin(Var(4)) -cos(Var(4)) 0; cos(Var(4)) -sin(Var(4)) 0; 0 0 1;];
+    MatR2y=[cos(Var(5)) 0 sin(Var(5)); 0 1 0; -sin(Var(5)) 0 cos(Var(5));];
+    MatR3z=[cos(Var(6)),-sin(Var(6)),0;sin(Var(6)),cos(Var(6)),0;0,0,1];
+    MatRp=MatR1z*MatR2y;
+    MatR=MatRp*MatR3z;
+    coor_A=(coor_O+MatR*[OH;0;AH])';    
+end
 
-for it_sim=1:size(Var,1)
+function draw_cone_once(h,Var)
     
+    load('robot');
 
-    plot3(glob_coor_xyz(:,1),glob_coor_xyz(:,2),glob_coor_xyz(:,3),'k');
-    axis(2*[-AH 1*AH -1*AH 1*AH -0.1 1*AH]);
-    xlabel('x(m)')
-    ylabel('y(m)')
-    zlabel('z(m)')
+    subplot(h);
+    
     hold on
     box on
     
-    coor_O=[Var(it_sim,1);Var(it_sim,2);Var(it_sim,3)];
-    MatR1z=[-sin(Var(it_sim,4)) -cos(Var(it_sim,4)) 0; cos(Var(it_sim,4)) -sin(Var(it_sim,4)) 0; 0 0 1;];
-    MatR2y=[cos(Var(it_sim,5)) 0 sin(Var(it_sim,5)); 0 1 0; -sin(Var(it_sim,5)) 0 cos(Var(it_sim,5));];
-    MatR3z=[cos(Var(it_sim,6)),-sin(Var(it_sim,6)),0;sin(Var(it_sim,6)),cos(Var(it_sim,6)),0;0,0,1];
+    coor_O=[Var(1);Var(2);Var(3)];
+    MatR1z=[-sin(Var(4)) -cos(Var(4)) 0; cos(Var(4)) -sin(Var(4)) 0; 0 0 1;];
+    MatR2y=[cos(Var(5)) 0 sin(Var(5)); 0 1 0; -sin(Var(5)) 0 cos(Var(5));];
+    MatR3z=[cos(Var(6)),-sin(Var(6)),0;sin(Var(6)),cos(Var(6)),0;0,0,1];
     MatRp=MatR1z*MatR2y;
     MatR=MatRp*MatR3z;
     coor_A=coor_O+MatR*[OH;0;AH];
@@ -402,8 +425,6 @@ for it_sim=1:size(Var,1)
 
 
     hold off 
-    pause(1/30);
-end
 
 end
 
