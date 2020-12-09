@@ -3,7 +3,7 @@ close all
 
 
 load('DynamicEquations.mat', 'q', 'dqdt')
-
+load FixedApexFunctions.mat
 
 FPS = 30;
 Duration = 10;
@@ -15,9 +15,9 @@ init_theta = pi/4;
 init_phi = pi/2;
 init_phi_dot = 0;
 
-xinit = compute_initial_states(q, dqdt, init_psi, init_theta, init_phi, init_phi_dot);
+xinit = compute_initial_states(q, dqdt, init_psi, init_theta, init_phi, init_phi_dot, solution_fun);
 
-cone_ode = @(t,x)state_dynamics(x);
+cone_ode = @(t,x)state_dynamics(x,solution_fun);
 
 [t,y] = ode45(cone_ode, linspace(0,Duration,N), xinit);
 
@@ -31,9 +31,9 @@ plots(t,y)
 save('FixedApexSolution', 'y')
 
 
-function dxdt = state_dynamics(x)
+function dxdt = state_dynamics(x,solution_fun)
 
-    load FixedApexFunctions.mat
+    %load FixedApexFunctions.mat
 
     q1 = x(1); 
     q2 = x(2); 
@@ -59,10 +59,10 @@ function dxdt = state_dynamics(x)
 end
 
 
-function xinit = compute_initial_states(q, dqdt, init_psi, init_theta, init_phi, init_phi_dot)
+function xinit = compute_initial_states(q, dqdt, init_psi, init_theta, init_phi, init_phi_dot, solution_fun)
 
 
-    load FixedApexFunctions.mat
+    %load FixedApexFunctions.mat
 
     % first solve for dependent (velocity) states
     constraint_matrix = subs(solution_fun.constraint_marix,...
