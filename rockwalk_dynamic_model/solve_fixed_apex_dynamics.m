@@ -11,8 +11,8 @@ N = round(Duration*FPS);
 
 
 init_psi = 0;
-init_theta = pi/4;
-init_phi = pi/2;
+init_theta = deg2rad(26);
+init_phi = pi/6;
 init_phi_dot = 0;
 
 xinit = compute_initial_states(q, dqdt, init_psi, init_theta, init_phi, init_phi_dot, solution_fun);

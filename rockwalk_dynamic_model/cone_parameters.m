@@ -19,13 +19,23 @@ function cone_params = cone_parameters(isSymbolic)
 
     else
 
+        %statue
         cone_params.mass = sym(1);
         cone_params.gravity = sym(9.8);
-        cone_params.radius = sym(0.35);
-        cone_params.lateral_CM_offset = sym(0.15);
-        cone_params.vertical_CM_offset = sym(0.30);
-        cone_params.lateral_apex_offset = sym(0.35);
-        cone_params.vertical_apex_offset = sym(1.50);
+        cone_params.radius = sym(1.26);
+        cone_params.lateral_CM_offset = sym(1.5);
+        cone_params.vertical_CM_offset = sym(3.175);
+        cone_params.lateral_apex_offset = sym(1.26);
+        cone_params.vertical_apex_offset = sym(7.35);
+        
+        % default
+%         cone_params.mass = sym(1);
+%         cone_params.gravity = sym(9.8);
+%         cone_params.radius = sym(0.35);
+%         cone_params.lateral_CM_offset = sym(0.15);
+%         cone_params.vertical_CM_offset = sym(0.30);
+%         cone_params.lateral_apex_offset = sym(0.35);
+%         cone_params.vertical_apex_offset = sym(1.50);
     end
     
 end
