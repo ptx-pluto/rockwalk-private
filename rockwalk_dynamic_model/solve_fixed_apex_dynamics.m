@@ -12,7 +12,7 @@ N = round(Duration*FPS);
 
 init_psi = 0;
 init_theta = deg2rad(26);
-init_phi = deg2rad(32.7510);
+init_phi = deg2rad(65);
 init_phi_dot = 0;
 
 xinit = compute_initial_states(q, dqdt, init_psi, init_theta, init_phi, init_phi_dot);
