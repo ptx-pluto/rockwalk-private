@@ -6,7 +6,7 @@ load('DynamicEquations.mat', 'q', 'dqdt')
 %load FixedApexFunctions.mat
 
 FPS = 30;
-Duration = 10;
+Duration = 5;
 N = round(Duration*FPS);
 
 
@@ -156,6 +156,18 @@ function plots(t,y)
     % plot(t, y(:,10))
     title('\phi')
 
+    [ts,ps] = find_peaks(t,y);
+    
+    subplot(3,2,6)
+    plot(t,y(:,5))
+    hold on
+    plot(ts,ps,'o');
+    % plot(t, y(:,10))
+    title('\phi')
+    
+    disp('period:');
+    disp(ts(3));
+    
 end
 
 
