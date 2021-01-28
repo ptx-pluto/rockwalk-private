@@ -1,4 +1,7 @@
-function [X,Y,Z] = cone_wire_frame()
+function [X,Y,Z] = cone_wire_frame(state)
+
+    addpath('./helper_functions')
+
 
     X = []; Y = []; Z = [];
 
@@ -36,5 +39,14 @@ Cz = zA;
 X = [X Cx];
 Y = [Y Cy];
 Z = [Z Cz];
+
+[rot_sb, rot_sbprime] = coordinate_frames([0 0 0 state(3) state(4) state(5)]);
+
+cords = [X;Y;Z];
+rot_cords = rot_sbprime * cords;
+
+X = rot_cords(1,:);
+Y = rot_cords(2,:);
+Z = rot_cords(3,:);
 
 end

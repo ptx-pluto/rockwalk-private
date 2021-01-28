@@ -45,11 +45,11 @@ title('\phi')
 axis ([0, time_tol, -1, 1]);
 
 subplot(3,2,6)
-[X,Y,Z] = cone_wire_frame();
+[X,Y,Z] = cone_wire_frame(state);
 p6 = plot3(X,Y,Z);
 grid on; 
 axis equal;
-axis ([-1, 1, -1, 1, 0, 2]);
+axis ([-1, 1, -1, 1, -0.5, 1.5]);
 
 % run simulation
 
@@ -76,6 +76,11 @@ while T < time_tol
     
     set(p5, 'XData', [get(p5, 'XData') T]);    
     set(p5, 'YData', [get(p5, 'YData') state(5)]);
+
+    [X,Y,Z] = cone_wire_frame(state);
+    set(p6, 'XData', X);    
+    set(p6, 'YData', Y);
+    set(p6, 'ZData', Z);
     
     drawnow;
     
