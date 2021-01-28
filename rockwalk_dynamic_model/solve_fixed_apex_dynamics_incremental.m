@@ -44,6 +44,13 @@ p5 = plot(T, state(5),'r-','LineWidth',1);
 title('\phi')
 axis ([0, time_tol, -1, 1]);
 
+subplot(3,2,6)
+[X,Y,Z] = cone_wire_frame();
+p6 = plot3(X,Y,Z);
+grid on; 
+axis equal;
+axis ([-1, 1, -1, 1, 0, 2]);
+
 % run simulation
 
 while T < time_tol
