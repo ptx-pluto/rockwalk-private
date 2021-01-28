@@ -48,7 +48,8 @@ axis ([0, time_tol, -1, 1]);
 
 while T < time_tol
    
-    [vt,vy] = ode45(@(t,x)eom_rnw_symbolic(x), [T T+ctime], state);
+    %[vt,vy] = ode45(@(t,x)eom_rnw_symbolic(x), [T T+ctime], state);
+    [vt,vy] = ode45(@(t,x)eom_rnw_numerical(x), [T T+ctime], state);
     
     T = T+ctime;
     state = vy(end,:)';
