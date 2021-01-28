@@ -1,14 +1,9 @@
 clear all
 close all
 
-
-%load('DynamicEquations.mat', 'q', 'dqdt')
-%load FixedApexFunctions.mat
-
 FPS = 30;
 Duration = 5;
 N = round(Duration*FPS);
-
 
 init_psi = 0;
 init_theta = deg2rad(10);
@@ -17,15 +12,27 @@ init_phi_dot = 0;
 
 xinit = init_state(init_psi, init_theta, init_phi, init_phi_dot);
 
-[t,y] = ode45(@(t,x)eom_rnw_symbolic(x), linspace(0,Duration,N), xinit);
+ctime = 0.02;
+T = 0;
 
-plots(t,y)
+all_t = [];
+all_y = [];
 
-% z coordinate (and corresponding velocity) can be computed from y
-% note, z = R*sin(theta); z_dot = R*cos(theta)*theta_dot
-% here, theta = y(:,4) and theta_dot = y(:,9)
+state = xinit;
 
-save('FixedApexSolution', 'y')
+while T < 5
+   
+    [vt,vy] = ode45(@(t,x)eom_rnw_symbolic(x), [T T+ctime], state);
+
+    all_t = [all_t;vt];
+    all_y = [all_y;vy];
+    
+    T = T+ctime;
+    state = vy(end,:)';
+    
+end
+
+plots(all_t,all_y);
 
 
 function plots(t,y)
@@ -70,9 +77,7 @@ function plots(t,y)
     plot(ts,ps,'o');
     % plot(t, y(:,10))
     title('\phi')
-    
-    disp('period:');
-    disp(ts(3));
+
     
 end
 
