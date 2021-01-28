@@ -1,84 +1,74 @@
 clear all
 close all
 
-FPS = 30;
-Duration = 5;
-N = round(Duration*FPS);
+% setup simulation
+
+time_tol = 5;
 
 init_psi = 0;
 init_theta = deg2rad(10);
 init_phi = deg2rad(40);
 init_phi_dot = 0;
 
-xinit = init_state(init_psi, init_theta, init_phi, init_phi_dot);
+state = init_state(init_psi, init_theta, init_phi, init_phi_dot);
 
 ctime = 0.02;
 T = 0;
 
-all_t = [];
-all_y = [];
+% setup figures
 
-state = xinit;
+figure(1)
+h1 = subplot(3,2,1);            
+p1 = plot(T, state(1),'r-','LineWidth',1);         
+xlabel('Time (s)');
+ylabel('x');
+axis ([0, time_tol, -1, 0]);
 
-while T < 5
+subplot(3,2,2)
+p2 = plot(T, state(2),'r-','LineWidth',1);
+title('y')
+axis ([0, time_tol, -1, 1]);
+
+subplot(3,2,3)
+p3 = plot(T, state(3),'r-','LineWidth',1);
+title('\psi')
+axis ([0, time_tol, -1, 1]);
+
+subplot(3,2,4)
+p4 = plot(T, state(4),'r-','LineWidth',1);
+title('\theta')
+axis ([0, time_tol, -1, 1]);
+
+subplot(3,2,5)
+p5 = plot(T, state(5),'r-','LineWidth',1);
+title('\phi')
+axis ([0, time_tol, -1, 1]);
+
+% run simulation
+
+while T < time_tol
    
     [vt,vy] = ode45(@(t,x)eom_rnw_symbolic(x), [T T+ctime], state);
-
-    all_t = [all_t;vt];
-    all_y = [all_y;vy];
     
     T = T+ctime;
     state = vy(end,:)';
     
-end
+          
+    set(p1, 'XData', [get(p1, 'XData') T]);
+    set(p1, 'YData', [get(p1, 'YData') state(1)]);
 
-plots(all_t,all_y);
-
-
-function plots(t,y)
-
-
-    subplot(3,2,1)
-    plot(t,y(:,1))
-    % hold on
-    % plot(t, y(:,6))
-    title('x')
-
-    subplot(3,2,2)
-    plot(t,y(:,2))
-    % hold on
-    % plot(t, y(:,7))
-    title('y')
-
-
-    subplot(3,2,3)
-    plot(t,y(:,3))
-    % hold on
-    % plot(t, y(:,8))
-    title('\psi')
-
-    subplot(3,2,4)
-    plot(t,y(:,4))
-    % hold on
-    % plot(t, y(:,9))
-    title('\theta')
-
-    subplot(3,2,5)
-    plot(t,y(:,5))
-    % hold on
-    % plot(t, y(:,10))
-    title('\phi')
-
-    [ts,ps] = find_peaks(t,y);
+    set(p2, 'XData', [get(p2, 'XData') T]);
+    set(p2, 'YData', [get(p2, 'YData') state(2)]);
     
-    subplot(3,2,6)
-    plot(t,y(:,5))
-    hold on
-    plot(ts,ps,'o');
-    % plot(t, y(:,10))
-    title('\phi')
-
+    set(p3, 'XData', [get(p3, 'XData') T]);    
+    set(p3, 'YData', [get(p3, 'YData') state(3)]);
+    
+    set(p4, 'XData', [get(p4, 'XData') T]);
+    set(p4, 'YData', [get(p4, 'YData') state(4)]);
+    
+    set(p5, 'XData', [get(p5, 'XData') T]);    
+    set(p5, 'YData', [get(p5, 'YData') state(5)]);
+    
+    drawnow;
     
 end
-
-
