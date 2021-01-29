@@ -6,13 +6,13 @@ close all
 time_tol = 5;
 
 init_psi = 0;
-init_theta = deg2rad(10);
+init_theta = deg2rad(30);
 init_phi = deg2rad(40);
 init_phi_dot = 0;
 
 state = init_state(init_psi, init_theta, init_phi, init_phi_dot);
 
-ctime = 0.02;
+ctime = 0.05;
 T = 0;
 
 % setup figures
