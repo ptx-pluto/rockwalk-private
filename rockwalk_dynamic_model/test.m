@@ -1,9 +1,5 @@
-load scaled_statue.mat
+clear all;
 
-[ts,ps] = find_peaks(t,y);
+load DynamicEquations.mat
 
-plot(t,y(:,5));
-hold on;
-plot(ts,ps,'o');
-
-disp(ts(3));
+disp(matrix_eom.mass_matrix)
