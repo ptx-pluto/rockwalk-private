@@ -1,5 +1,7 @@
 clear all;
 
-load DynamicEquations.mat
+cone_params = cone_parameters(false);
 
-disp(matrix_eom.mass_matrix)
+c2 = cone_params;
+
+c2.mass = 1;
