@@ -3,7 +3,7 @@ function [t,y] = solve_fixed_apex_dynamics_param(cone_params)
     load('DynamicEquations.mat', 'q', 'dqdt')
 
     FPS = 30;
-    Duration = 5;
+    Duration = 3;
     N = round(Duration*FPS);
 
     init_psi = 0;

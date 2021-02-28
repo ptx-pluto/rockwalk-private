@@ -2,24 +2,14 @@ clear all;
 
 cone_params = cone_parameters(false);
 
-%offsets = [-0.2 -0.1 0 0.1 0.2 0.3];
-%offsets = -0.5:0.1:0.5;
-%offsets = -1.5:0.5:1.5;
-%offsets = 0.5:0.1:2.0
-
 offsets = -0.6:0.1:0.6;
-
 
 N = size(offsets,2);
 
 results = [];
 
 parfor i = 1:N
-    %c = cone_params;
     delta = offsets(i);
-    %c.vertical_CM_offset = c.vertical_CM_offset + delta;
-    %c.lateral_CM_offset = c.lateral_CM_offset + delta;
-    %c.mass = c.mass*3;
     c = cone_move_com_x(cone_params, delta);
     [t,y] = solve_fixed_apex_dynamics_param(c);
     results(i).t = t;
@@ -29,8 +19,6 @@ end
 save('results');
 
 plot_full_state_multi(results);
-
-
 
 function rst = cone_move_com_x(cone, ratio)
 
