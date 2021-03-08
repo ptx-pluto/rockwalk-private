@@ -2,7 +2,7 @@ clear all;
 
 cone_params = cone_parameters(false);
 
-offsets = -0.6:0.05:0.6;
+offsets = -0.6:0.1:0.6;
 
 N = size(offsets,2);
 
@@ -18,7 +18,16 @@ end
 
 save('results');
 
-plot_full_state_multi(results);
+
+pds = zeros(1,N);
+
+for i=1:N
+    [ts,ps] = find_peaks(t,y);
+    pds(i) = ts(3);
+end
+
+plot(offsets,pds);
+
 
 function rst = cone_move_com_x(cone, ratio)
 
